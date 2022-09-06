@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .last,
+        .now,
+        .next {
+            height: 40px;
+            border-bottom: 1px solid bisque;
+            line-height: 40px;
+        }
+
+        .wrap {
+            position: relative;
+        }
+
+        .lyrics {
+            position: absolute;
+            top: 40px;
+            transition: all .3s;
+        }
+
+        .lyricdiv {
+            height: 40px;
+            line-height: 40px;
+
+        }
+
+        .active-lyric {
+            font-size: 33px;
+            color: chartreuse;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="last"></div>
+        <div class="now"></div>
+        <div class="next"></div>
+        <div class="lyrics">
+
+        </div>
+    </div>
+
+</body>
+<script>
+    var last = document.getElementsByClassName('last')[0];
+    var now = document.getElementsByClassName('now')[0];
+    var next = document.getElementsByClassName('next')[0];
+    var lyricsdiv = document.getElementsByClassName('lyrics')[0];
+
+
+
+    var duration = 3.44;
+    var data = `lyric: "[00:00.00] ^_^↵ ↵[00:25.52]梅雨后的香樟叶↵[00:29.76]浅浅勾起了思念↵[00:34.23]泛黄的过往诗篇↵[00:36.49]似燕尾轻惹湖面↵[00:38.51]手中的茶慢慢浅去↵[00:40.50]细品一句爱过知味↵[00:44.66]路过小镇惹了谁↵[00:48.04]曲笛声↵[00:49.62]话凄美↵[00:51.71]茉莉花开曲径迂回↵[00:56.73]爱无悔↵[00:58.36]马蹄声声催 暌违↵[01:01.38]道不尽相思味↵[01:04.80]雨纷飞↵[01:06.35]梨花美↵[01:08.76]闲坐树下话予谁对↵[01:13.31]新叶垂↵[01:15.22]听纸吹皱了↵[01:18.61]错与对的是非↵[01:21.16]被微风裁碎↵[01:43.35]梅雨后的香樟叶↵[01:47.40]浅浅勾起了思念↵[01:51.90]泛黄的过往诗篇↵[01:54.06]似燕尾轻惹湖面↵[01:56.30]手中的茶慢慢浅去↵[01:58.40]细品一句爱过知味↵[02:02.26]路过小镇惹了谁↵[02:05.47]曲笛声↵[02:07.45]话凄美↵[02:09.58]茉莉花开曲径迂回↵[02:14.52]爱无悔↵[02:15.64]马蹄声声催 暌违↵[02:18.91]道不尽相思味↵[02:23.37]雨纷飞↵[02:24.63]梨花美↵[02:26.55]闲坐树下话予谁对↵[02:31.39]新叶垂↵[02:32.97]听纸吹皱了↵[02:35.59]错与对的是非↵[02:39.30]曲笛声↵[02:41.12]话凄美↵[02:43.16]茉莉花开曲径迂回↵[02:47.86]爱无悔↵[02:49.46]马蹄声声催 暌违↵[02:52.69]道不尽相思味↵[02:55.84]雨纷飞↵[02:57.97]梨花美↵[03:00.18]闲坐树下话予谁对↵[03:04.98]新叶垂↵[03:06.64]听纸吹皱了↵[03:09.45]错与对的是非↵[03:12.62]被微风裁碎↵[03:44.00]未经许可,不得翻唱或使用"`
+    var lyric = data.slice(8, data.length - 1);
+    var lyrics = lyric.split('↵');
+    var start = lyrics.filter((item, index, arr) => {
+        if (item.indexOf('[') == -1) {
+            return index
+        }
+    })
+    lyrics.splice(start + 1, 1);
+    // 此处lyrics已经是过滤空行的歌词了
+    lyrics.forEach((value, index) => {
+        let key = value.split(']')[0] + ']';
+        let lyvalue = value.split(']')[1];
+        lyrics[index] = { time: key, lyric: lyvalue };
+        let lyricdiv = document.createElement('div');
+        lyricdiv.innerHTML = lyvalue;
+        lyricdiv.className = "lyricdiv";
+        lyricsdiv.appendChild(lyricdiv);
+    })
+    // lyrics已经成为对象形式：{lyric: "梅雨后的香樟叶", time: "[00:25.52]"}
+    var handletime = function (time) {
+        time = time.slice(1, time.length - 1)
+        let minute = time.split(':')[0];
+        let second = time.split(':')[1];
+        let millisecond = (Number(minute) * 60 + Number(second)) * 1000;
+        // console.log(millisecond)
+        return millisecond;
+    }
+    // console.log(lyrics)
+    var timeline = 0;
+    var nowindex = 0;
+
+    let lyricdiv = document.getElementsByClassName('lyricdiv');
+    // 歌词按照时间依次get
+    setInterval(function () {
+        let lyrictime = handletime(lyrics[nowindex].time);
+        if (lyrictime == timeline) {
+            lyricsdiv.style.top = -40 * (nowindex - 1) + 'px';
+            console.log(lyricdiv[nowindex].innerHTML)
+            lyricdiv[nowindex].classList.add('active-lyric');
+            if (nowindex != 0) {
+                lyricdiv[nowindex - 1].classList.remove('active-lyric')
+            }
+            nowindex = nowindex + 1;
+        }
+        timeline += 10;
+    }, 10)
+</script>
+
+</html>
